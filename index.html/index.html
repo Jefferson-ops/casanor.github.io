@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Controle de Estoque | Casa Nor</title> 
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Estoque - Condomínio Casa Nor</h1>
+    <form id="product-form">
+      <input type="text" id="name" placeholder="Nome do produto" required />
+      <input type="text" id="unit" placeholder="Quantidade física (ex: 500ml, 5L)" required />
+      <input type="number" id="stock" placeholder="Unidades no estoque" required />
+      <input type="text" id="desc" placeholder="Descrição (caixa, pacote...)" required />
+      <button type="submit">Salvar</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Unidades</th>
+          <th>Qtd Física</th>
+          <th>Descrição</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Dados dinâmicos -->
+      </tbody>
+    </table>
+  </div>
+  <footer>By Jefferson Oliveira.&reg</footer>
+  <script src="script.js"></script>
+</body>
+</html>
