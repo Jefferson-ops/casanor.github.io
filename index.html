@@ -34,21 +34,21 @@
       <h2>Cadastrar Produto</h2>
       <form id="product-form">
         <div class="form-group">
-          <label for="name">Nome do produto *</label>
+          <label for="name"><i class="fas fa-tag"></i> Nome do produto *</label>
           <input type="text" id="name" name="name" required 
                  placeholder="Ex: Detergente, Multiuso..." autocomplete="off">
           <div class="error-message" id="name-error"></div>
         </div>
 
         <div class="form-group">
-          <label for="unit">Peso líquido *</label>
+          <label for="unit"><i class="fas fa-weight-hanging"></i> Peso líquido *</label>
           <input type="text" id="unit" name="unit" required 
                  placeholder="Ex: 500 ml" autocomplete="off">
           <div class="error-message" id="unit-error"></div>
         </div>
 
         <div class="form-group">
-          <label for="stock">Quantidade em estoque *</label>
+          <label for="stock"><i class="fas fa-boxes"></i> Quantidade em estoque *</label>
           <input type="number" id="stock" name="stock" required 
                  min="0" step="1" max="1000" placeholder="Min: 0"
                  class="number-input">
@@ -56,7 +56,7 @@
         </div>
 
         <div class="form-group">
-          <label for="desc">Descrição *</label>
+          <label for="desc"><i class="fas fa-align-left"></i> Descrição *</label>
           <textarea id="desc" name="desc" 
                     placeholder="Ex: Pacote, Galão..."></textarea>
         </div>
