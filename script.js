@@ -519,7 +519,7 @@ function handleSaida(index) {
   registrarMovimentacao('saida', { ...produto }, qtd);
   
   saveProdutos();
-  showToast(`Saída de ${qtd} ${produto.unidade} registrada!`, 'success');
+  showToast(`Saída de ${produto.nome} ${produto.unidade} registrada!`, 'success');
 }
 
 // Confirma a exclusão de um produto
