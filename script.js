@@ -26,7 +26,7 @@ function initTheme() {
   const themeToggle = document.getElementById('theme-toggle');
   const themeIcon = themeToggle.querySelector('i');
   
-  // Verifica o tema salvo ou usa a preferência do sistema
+ // Verifica o tema salvo ou usa a preferência do sistema
   const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 
                     (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   
@@ -58,17 +58,30 @@ function updateThemeIcon(iconElement, theme) {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
-  // Inicializa o tema
-  initTheme();
-  
-  // Atualiza o ano no rodapé
-  document.getElementById('current-year').textContent = new Date().getFullYear();
-  
-  // Carrega os produtos
-  renderProdutos();
-  
-  // Configura os eventos
-  setupEventListeners();
+  try {
+    // Inicializa o tema
+    initTheme();
+    
+    // Atualiza o ano no rodapé
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+    
+    // Carrega os produtos
+    renderProdutos();
+    
+    // Configura os eventos
+    setupEventListeners();
+    
+    // Verifica se há um tema salvo
+    const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+    
+    console.log('Aplicação inicializada com sucesso!');
+  } catch (error) {
+    console.error('Erro ao inicializar a aplicação:', error);
+    showToast('Ocorreu um erro ao carregar a aplicação', 'error');
+  }
 });
 
 // Configura os eventos
@@ -83,6 +96,40 @@ function setupEventListeners() {
   searchInput.addEventListener('input', () => {
     renderProdutos(searchInput.value.toLowerCase());
   });
+  
+  // Toggle da tabela de produtos
+  const toggleTableBtn = document.getElementById('toggle-table');
+  const productsSection = document.getElementById('products-section');
+  
+  if (toggleTableBtn && productsSection) {
+    // Verifica se já existe um estado salvo, senão inicia como visível
+    const tableVisible = localStorage.getItem('tableVisible') === null ? true : localStorage.getItem('tableVisible') === 'true';
+    
+    // Aplica o estado inicial
+    if (!tableVisible) {
+      productsSection.classList.add('collapsed');
+      toggleTableBtn.innerHTML = '<i class="fas fa-chevron-right"></i> Mostrar Produtos em Estoque';
+      toggleTableBtn.classList.add('collapsed');
+    } else {
+      toggleTableBtn.innerHTML = '<i class="fas fa-chevron-down"></i> Ocultar Produtos em Estoque';
+    }
+    
+    toggleTableBtn.addEventListener('click', () => {
+      productsSection.classList.toggle('collapsed');
+      const isCollapsed = productsSection.classList.contains('collapsed');
+      
+      // Atualiza o ícone e o texto do botão
+      if (isCollapsed) {
+        toggleTableBtn.innerHTML = '<i class="fas fa-chevron-right"></i> Mostrar Produtos em Estoque';
+      } else {
+        toggleTableBtn.innerHTML = '<i class="fas fa-chevron-down"></i> Ocultar Produtos em Estoque';
+      }
+      
+      // Salva o estado no localStorage
+      localStorage.setItem('tableVisible', !isCollapsed);
+      toggleTableBtn.classList.toggle('collapsed', isCollapsed);
+    });
+  }
   
   // Previne o envio do formulário ao pressionar Enter em campos de texto
   form.addEventListener('keydown', (e) => {
@@ -99,15 +146,26 @@ function setupEventListeners() {
   
   // Fechar modal ao clicar fora do conteúdo
   window.addEventListener('click', (e) => {
+    const historyModal = document.getElementById('history-modal');
     if (e.target === historyModal) {
       closeHistoryModal();
     }
+    
+    if (e.target === editModal) {
+      closeEditModal();
+    }
   });
-  
+
   // Fechar modal com tecla Esc
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && historyModal.classList.contains('show')) {
-      closeHistoryModal();
+    const historyModal = document.getElementById('history-modal');
+    if (e.key === 'Escape') {
+      if (historyModal.style.display === 'flex') {
+        closeHistoryModal();
+      }
+      if (editModal.style.display === 'flex') {
+        closeEditModal();
+      }
     }
   });
 }
@@ -203,58 +261,54 @@ function hideError(field) {
 
 // Renderiza a lista de produtos
 function renderProdutos(searchTerm = '') {
-  let filteredProdutos = [...produtos];
-  
-  // Filtra os produtos se houver um termo de busca
-  if (searchTerm) {
-    filteredProdutos = produtos.filter(produto => 
-      produto.nome.toLowerCase().includes(searchTerm) ||
-      (produto.descricao && produto.descricao.toLowerCase().includes(searchTerm))
-    );
-  }
-  
-  // Limpa a tabela
-  tableBody.innerHTML = '';
-  
-  // Exibe mensagem de lista vazia se não houver produtos
+  const filteredProdutos = searchTerm
+    ? produtos.filter(produto => 
+        produto.nome.toLowerCase().includes(searchTerm) ||
+        (produto.descricao && produto.descricao.toLowerCase().includes(searchTerm)) ||
+        produto.unidade.toLowerCase().includes(searchTerm)
+      )
+    : [...produtos];
+
+  // Ordena por nome
+  filteredProdutos.sort((a, b) => a.nome.localeCompare(b.nome));
+
   if (filteredProdutos.length === 0) {
+    tableBody.innerHTML = '';
     emptyState.style.display = 'block';
     return;
   }
-  
-  // Esconde mensagem de lista vazia
+
   emptyState.style.display = 'none';
-  
-  // Adiciona os produtos à tabela
-  filteredProdutos.forEach((produto, index) => {
-    const tr = document.createElement('tr');
-    tr.className = 'fade-in';
-    tr.innerHTML = `
-      <td data-label="Produto">${produto.nome}</td>
-      <td data-label="Estoque">${formatNumber(produto.estoque)}</td>
-      <td data-label="Unidade">${produto.unidade}</td>
-      <td data-label="Descrição">${produto.descricao || '-'}</td>
-      <td class="actions" data-label="Ações">
-        <button class="btn btn-edit" data-index="${index}" aria-label="Editar">
-          <i class="fas fa-edit"></i>
-        </button>
-        <button class="btn btn-out" data-index="${index}" aria-label="Dar saída" title="Dar baixa no estoque">
-          <i class="fas fa-arrow-down"></i>
-        </button>
-        <button class="btn btn-danger" data-index="${index}" aria-label="Excluir">
-          <i class="fas fa-trash"></i>
-        </button>
-      </td>
+  tableBody.innerHTML = filteredProdutos.map((produto) => {
+    // Encontra o índice original do produto no array principal
+    const originalIndex = produtos.findIndex(p => 
+      p.nome === produto.nome && 
+      p.unidade === produto.unidade &&
+      p.estoque === produto.estoque
+    );
+    
+    return `
+      <tr data-original-index="${originalIndex}">
+        <td>${produto.nome}</td>
+        <td>${formatNumber(produto.estoque)}</td>
+        <td>${produto.unidade}</td>
+        <td>${produto.descricao || '-'}</td>
+        <td class="actions">
+          <div class="action-buttons">
+            <button class="btn-icon btn-primary" onclick="handleSaida(${originalIndex})" title="Registrar saída">
+              <i class="fas fa-minus"></i>
+            </button>
+            <button class="btn-icon btn-edit" onclick="editProduto(${originalIndex})" title="Editar">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-icon btn-delete" onclick="confirmDelete(${originalIndex})" title="Excluir">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
     `;
-    
-    // Adiciona os eventos aos botões
-    const buttons = tr.querySelectorAll('button');
-    buttons[0].addEventListener('click', () => editProduto(index));
-    buttons[1].addEventListener('click', () => handleSaida(index));
-    buttons[2].addEventListener('click', () => confirmDelete(index));
-    
-    tableBody.appendChild(tr);
-  });
+  }).join('');
 }
 
 // Formata números com separador de milhar
@@ -262,27 +316,158 @@ function formatNumber(num) {
   return new Intl.NumberFormat('pt-BR').format(num);
 }
 
-// Edita um produto
+// Elementos do modal de edição
+const editModal = document.getElementById('edit-modal');
+const editForm = document.getElementById('edit-form');
+const cancelEditBtn = document.getElementById('cancel-edit');
+const closeEditModalBtn = editModal ? editModal.querySelector('.close-modal') : null;
+
+// Abre o modal de edição
 function editProduto(index) {
-  const produto = produtos[index];
-  if (!produto) return;
-  
-  // Preenche o formulário
-  form.elements['name'].value = produto.nome;
-  form.elements['unit'].value = produto.unidade;
-  form.elements['stock'].value = produto.estoque;
-  form.elements['desc'].value = produto.descricao || '';
-  
-  // Atualiza o estado
-  editIndex = index;
-  cancelBtn.style.display = 'inline-flex';
-  
-  // Rola até o formulário
-  form.scrollIntoView({ behavior: 'smooth' });
-  form.elements['name'].focus();
-  
-  showToast('Preencha os campos e clique em Salvar para atualizar', 'info');
+  try {
+    // Verifica se o índice é válido
+    if (index < 0 || index >= produtos.length) {
+      showToast('Produto não encontrado', 'error');
+      return;
+    }
+    
+    const produto = produtos[index];
+    if (!produto) return;
+    
+    // Atualiza o estado
+    editIndex = index;
+    
+    // Preenche o formulário do modal
+    document.getElementById('edit-name').value = produto.nome;
+    document.getElementById('edit-unit').value = produto.unidade;
+    document.getElementById('edit-stock').value = produto.estoque;
+    document.getElementById('edit-desc').value = produto.descricao || '';
+    
+    // Exibe o modal
+    if (editModal) {
+      editModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      
+      // Adiciona a classe 'show' para garantir a visibilidade
+      setTimeout(() => {
+        editModal.classList.add('show');
+      }, 10);
+      
+      // Foca no primeiro campo
+      document.getElementById('edit-name').focus();
+    } else {
+      console.error('Elemento do modal de edição não encontrado');
+      showToast('Erro ao abrir o formulário de edição', 'error');
+    }
+  } catch (error) {
+    console.error('Erro ao editar produto:', error);
+    showToast('Erro ao abrir o formulário de edição', 'error');
+  }
 }
+
+// Fecha o modal de edição
+function closeEditModal() {
+  try {
+    if (!editModal) return;
+    
+    // Adiciona uma classe para a animação de saída
+    editModal.classList.add('closing');
+    
+    // Espera a animação terminar antes de esconder o modal
+    setTimeout(() => {
+      editModal.classList.remove('show', 'closing');
+      editModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+      
+      // Limpa o formulário
+      if (editForm) {
+        editForm.reset();
+      }
+      
+      // Reseta o índice de edição
+      editIndex = -1;
+    }, 200);
+  } catch (error) {
+    console.error('Erro ao fechar o modal de edição:', error);
+    // Força o fechamento em caso de erro
+    if (editModal) {
+      editModal.classList.remove('show', 'closing');
+      editModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+  }
+}
+
+// Configura o evento de envio do formulário de edição
+if (editForm) {
+  editForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    try {
+      if (editIndex === -1) {
+        showToast('Nenhum produto selecionado para edição', 'error');
+        return;
+      }
+      
+      // Validação básica
+      const name = document.getElementById('edit-name')?.value.trim();
+      const unit = document.getElementById('edit-unit')?.value.trim();
+      const stock = document.getElementById('edit-stock')?.value;
+      
+      if (!name || !unit || !stock) {
+        showToast('Preencha todos os campos obrigatórios', 'error');
+        return;
+      }
+      
+      // Atualiza o produto
+      const produtoAntigo = { ...produtos[editIndex] };
+      
+      produtos[editIndex] = {
+        ...produtos[editIndex],
+        nome: name,
+        unidade: unit,
+        estoque: parseFloat(stock),
+        descricao: document.getElementById('edit-desc')?.value.trim() || '',
+        dataAtualizacao: new Date().toISOString()
+      };
+      
+      // Registra a movimentação
+      registrarMovimentacao('edicao', produtos[editIndex], null, produtoAntigo);
+      
+      // Salva e atualiza a interface
+      saveProdutos();
+      renderProdutos(searchInput ? searchInput.value.toLowerCase() : '');
+      closeEditModal();
+      
+      showToast('Produto atualizado com sucesso!', 'success');
+    } catch (error) {
+      console.error('Erro ao salvar as alterações:', error);
+      showToast('Erro ao salvar as alterações', 'error');
+    }
+  });
+} else {
+  console.error('Formulário de edição não encontrado');
+}
+
+// Fechar modal ao clicar no botão de fechar
+closeEditModalBtn.addEventListener('click', closeEditModal);
+
+// Fechar modal ao clicar fora do conteúdo
+window.addEventListener('click', (e) => {
+  if (e.target === editModal) {
+    closeEditModal();
+  }
+});
+
+// Fechar modal com tecla Esc
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && editModal.style.display === 'block') {
+    closeEditModal();
+  }
+});
+
+// Cancelar edição
+cancelEditBtn.addEventListener('click', closeEditModal);
 
 // Cancela a edição
 function cancelEdit() {
@@ -383,15 +568,57 @@ function saveProdutos() {
 
 // Abre o modal de histórico
 function openHistoryModal() {
-  historyModal.classList.add('show');
-  document.body.style.overflow = 'hidden';
-  renderHistory();
+  try {
+    const historyModal = document.getElementById('history-modal');
+    if (!historyModal) {
+      console.error('Elemento do modal de histórico não encontrado');
+      return;
+    }
+    
+    historyModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Força a renderização do histórico
+    renderHistory();
+    
+    // Adiciona a classe 'show' para garantir a visibilidade
+    setTimeout(() => {
+      historyModal.classList.add('show');
+    }, 10);
+  } catch (error) {
+    console.error('Erro ao abrir o histórico:', error);
+    showToast('Erro ao abrir o histórico', 'error');
+  }
 }
 
 // Fecha o modal de histórico
 function closeHistoryModal() {
-  historyModal.classList.remove('show');
-  document.body.style.overflow = '';
+  try {
+    const historyModal = document.getElementById('history-modal');
+    if (!historyModal) {
+      console.error('Elemento do modal de histórico não encontrado');
+      return;
+    }
+    
+    // Adiciona uma classe para a animação de saída
+    historyModal.classList.add('closing');
+    
+    // Espera a animação terminar antes de esconder o modal
+    setTimeout(() => {
+      historyModal.classList.remove('show', 'closing');
+      historyModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }, 200);
+  } catch (error) {
+    console.error('Erro ao fechar o histórico:', error);
+    // Força o fechamento em caso de erro
+    const historyModal = document.getElementById('history-modal');
+    if (historyModal) {
+      historyModal.classList.remove('show', 'closing');
+      historyModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+  }
 }
 
 // Renderiza o histórico de movimentações
