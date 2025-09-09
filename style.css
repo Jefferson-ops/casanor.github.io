@@ -376,7 +376,7 @@ textarea:focus {
 /* Estilo para o ícone de menos no botão de saída */
 .btn-icon.btn-primary[title="Registrar saída"] {
   position: relative;
-  background-color: transparent;
+  background-color: whitesmoke;
   color: var(--primary);
   border: 2px solid var(--primary);
 }
@@ -386,23 +386,12 @@ textarea:focus {
   color: white;
 }
 
-/* Círculo com traço branco */
+/* Estilo para o ícone de seta para baixo */
 .btn-icon.btn-primary[title="Registrar saída"] i {
-  position: relative;
-  width: 14px;
-  height: 14px;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.btn-icon.btn-primary[title="Registrar saída"] i::before {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 2px;
-  background-color: currentColor;
-  border-radius: 1px;
 }
 
 /* Estilos para o modal */
@@ -863,6 +852,38 @@ textarea:focus {
 [data-theme="dark"] .table-responsive {
   border: var(--border-dark);
   background-color: var(--dark-card-bg);
+}
+
+/* Estilos para a transição da pesquisa */
+#table-body {
+  transition: all 0.3s ease-in-out;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#table-body.searching {
+  opacity: 0.6;
+  transform: translateY(5px);
+}
+
+#table-body tr {
+  transition: all 0.3s ease-in-out;
+  transform-origin: top;
+}
+
+#table-body tr:not(.empty-message) {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Garantindo que a tabela preencha o container */
