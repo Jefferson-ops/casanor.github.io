@@ -36,7 +36,7 @@
         <div class="form-group">
           <label for="name">Nome do produto *</label>
           <input type="text" id="name" name="name" required 
-                 placeholder="Ex: Multiuso..." autocomplete="off">
+                 placeholder="Ex: Detergente, Multiuso..." autocomplete="off">
           <div class="error-message" id="name-error"></div>
         </div>
 
@@ -50,7 +50,8 @@
         <div class="form-group">
           <label for="stock">Quantidade em estoque *</label>
           <input type="number" id="stock" name="stock" required 
-                 min="0" step="1" max="1000" placeholder="0">
+                 min="0" step="1" max="1000" placeholder="Min: 0"
+                 class="number-input">
           <div class="error-message" id="stock-error"></div>
         </div>
 
@@ -71,11 +72,16 @@
       </form>
     </section>
 
-    <section class="card">
+    <button id="toggle-table" class="btn btn-secondary toggle-table-btn">
+      <i class="fas fa-chevron-down"></i> Mostrar Produtos em Estoque
+    </button>
+    
+    <section id="products-section" class="card">
       <div class="table-header">
         <h2>Produtos em Estoque</h2>
         <div class="search-container">
-          <input type="text" id="search" placeholder="       Pesquisar..." class="search-input">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="search" placeholder="Pesquisar..." class="search-input">
         </div>
       </div>
       
@@ -85,7 +91,7 @@
             <tr>
               <th scope="col">Produto</th>
               <th scope="col">Estoque</th>
-              <th scope="col">Unidade</th>
+              <th scope="col">Peso líquido</th>
               <th scope="col">Descrição</th>
               <th scope="col" class="actions">Ações</th>
             </tr>
@@ -137,6 +143,47 @@
         <div class="history-list" id="history-list">
           <!-- Histórico será preenchido via JavaScript -->
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Edição -->
+  <div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Editar Produto</h3>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="edit-form">
+          <div class="form-group">
+            <label for="edit-name">Nome do produto *</label>
+            <input type="text" id="edit-name" name="name" required>
+            <div class="error-message" id="edit-name-error"></div>
+          </div>
+          <div class="form-group">
+            <label for="edit-unit">Peso líquido *</label>
+            <input type="text" id="edit-unit" name="unit" required>
+            <div class="error-message" id="edit-unit-error"></div>
+          </div>
+          <div class="form-group">
+            <label for="edit-stock">Quantidade em estoque *</label>
+            <input type="number" id="edit-stock" name="stock" required min="0">
+            <div class="error-message" id="edit-stock-error"></div>
+          </div>
+          <div class="form-group">
+            <label for="edit-desc">Descrição</label>
+            <textarea id="edit-desc" name="desc"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+            <button type="button" class="btn btn-secondary" id="cancel-edit">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
