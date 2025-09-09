@@ -92,9 +92,22 @@ function setupEventListeners() {
   // Botão de cancelar edição
   cancelBtn.addEventListener('click', cancelEdit);
   
-  // Busca em tempo real
-  searchInput.addEventListener('input', () => {
-    renderProdutos(searchInput.value.toLowerCase());
+  // Busca em tempo real com debounce para melhor desempenho
+  let searchTimeout;
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      const searchTerm = e.target.value.toLowerCase();
+      // Adiciona classe de carregamento
+      tableBody.classList.add('searching');
+      
+      // Pequeno atraso para permitir a animação de transição
+      setTimeout(() => {
+        renderProdutos(searchTerm);
+        // Remove a classe de carregamento após a renderização
+        setTimeout(() => tableBody.classList.remove('searching'), 50);
+      }, 150);
+    }, 200); // Atraso de 200ms após a digitação
   });
   
   // Toggle da tabela de produtos
@@ -296,7 +309,7 @@ function renderProdutos(searchTerm = '') {
         <td class="actions">
           <div class="action-buttons">
             <button class="btn-icon btn-primary" onclick="handleSaida(${originalIndex})" title="Registrar saída">
-              <i class="fas fa-minus"></i>
+              <i class="fas fa-arrow-down"></i>
             </button>
             <button class="btn-icon btn-edit" onclick="editProduto(${originalIndex})" title="Editar">
               <i class="fas fa-edit"></i>
@@ -483,6 +496,10 @@ function handleSaida(index) {
   if (!produto) return;
   
   const quantidade = prompt(`Quantas unidades de ${produto.unidade} deseja dar saída?`, '1');
+  
+  // Se o usuário cancelar, o prompt retorna null
+  if (quantidade === null) return;
+  
   const qtd = parseFloat(quantidade);
   
   if (isNaN(qtd) || qtd <= 0) {
