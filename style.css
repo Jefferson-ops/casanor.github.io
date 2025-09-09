@@ -62,7 +62,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   line-height: 1.6;
   color: var(--dark);
-  background-color: #f5f7fa;
+  background: #f4f6f8;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -216,6 +216,71 @@ textarea {
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
+/* Estilo para campos numéricos */
+input[type="number"] {
+  width: 100%;
+  padding: 0.6rem 2.5rem 0.6rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  background-color: var(--input-bg);
+  color: var(--text);
+  transition: all 0.2s ease;
+  -moz-appearance: textfield; /* Firefox */
+  appearance: textfield; /* Outros navegadores */
+}
+
+/* Remove as setas padrão no Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Estilos para campos de número */
+input[type="number"] {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  background-color: var(--input-bg);
+  color: var(--text);
+}
+
+/* Ajuste para tema escuro */
+[data-theme="dark"] input[type="number"] {
+  background-color: var(--dark-card-bg);
+  border-color: var(--dark-border);
+  color: var(--dark-text);
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"]:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.2);
+  outline: none;
+}
+
+/* Ajustes para tema escuro */
+[data-theme="dark"] .number-input-container::before,
+[data-theme="dark"] .number-input-container::after {
+  background-color: var(--dark-card-bg);
+  border-color: var(--dark-border);
+  color: var(--dark-text-muted);
+}
+
+[data-theme="dark"] .number-input-container:hover::before,
+[data-theme="dark"] .number-input-container:hover::after {
+  background-color: var(--dark-hover-bg);
+  color: var(--primary);
+}
+
 [data-theme="dark"] input[type="text"],
 [data-theme="dark"] input[type="number"],
 [data-theme="dark"] input[type="email"],
@@ -248,6 +313,309 @@ textarea:focus {
 }
 
 /* Botões */
+/* Estilos para os botões de ação na tabela */
+.actions {
+  white-space: nowrap;
+  text-align: right;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.btn-icon {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-icon i {
+  font-size: 0.9rem;
+}
+
+.btn-icon.btn-edit {
+  color: var(--info);
+  border-color: var(--info);
+}
+
+.btn-icon.btn-edit:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.btn-icon.btn-delete {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.btn-icon.btn-delete:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+.btn-icon.btn-primary {
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  position: relative;
+}
+
+.btn-icon.btn-primary:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* Estilo para o ícone de menos no botão de saída */
+.btn-icon.btn-primary[title="Registrar saída"] {
+  position: relative;
+  background-color: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.btn-icon.btn-primary[title="Registrar saída"]:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* Círculo com traço branco */
+.btn-icon.btn-primary[title="Registrar saída"] i {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon.btn-primary[title="Registrar saída"] i::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 2px;
+  background-color: currentColor;
+  border-radius: 1px;
+}
+
+/* Estilos para o modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 1rem;
+  box-sizing: border-box;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, left 0s 0.3s;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.show {
+  left: 0;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.3s ease-in-out, left 0s 0s;
+}
+
+/* Garante que o modal não fique visível durante o carregamento */
+.modal:not(.show) {
+  display: none;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animações para o fechamento */
+.modal.closing {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.modal.closing .modal-content {
+  animation: modalFadeOut 0.2s ease-in-out forwards;
+}
+
+@keyframes modalFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--gray);
+  transition: color 0.2s ease;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.close-modal:hover {
+  color: var(--danger);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+/* Estilos para o formulário dentro do modal */
+#edit-form .form-group {
+  margin-bottom: 1.25rem;
+}
+
+#edit-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+#edit-form input[type="text"],
+#edit-form input[type="number"],
+#edit-form textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: var(--card-bg);
+  color: var(--text);
+}
+
+#edit-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+#edit-form input[type="text"]:focus,
+#edit-form input[type="number"]:focus,
+#edit-form textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.2);
+  outline: none;
+}
+
+/* Estilos para o tema escuro */
+[data-theme="dark"] .modal-content {
+  background-color: var(--dark-card-bg);
+  border: 1px solid var(--dark-border);
+}
+
+[data-theme="dark"] .modal-header {
+  border-bottom-color: var(--dark-border);
+}
+
+[data-theme="dark"] .modal-header h3 {
+  color: var(--dark-text);
+}
+
+[data-theme="dark"] .close-modal {
+  color: var(--dark-text-muted);
+}
+
+[data-theme="dark"] .close-modal:hover {
+  color: var(--danger);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] #edit-form input[type="text"],
+[data-theme="dark"] #edit-form input[type="number"],
+[data-theme="dark"] #edit-form textarea {
+  background-color: var(--dark-card-bg);
+  border-color: var(--dark-border);
+  color: var(--dark-text);
+}
+
+[data-theme="dark"] #edit-form input[type="text"]:focus,
+[data-theme="dark"] #edit-form input[type="number"]:focus,
+[data-theme="dark"] #edit-form textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+}
+
+/* Estilos para dispositivos móveis */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    margin: 1rem auto;
+  }
+  
+  .action-buttons {
+    gap: 0.3rem;
+  }
+  
+  .btn-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  
+  .btn-icon i {
+    font-size: 0.8rem;
+  }
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -319,6 +687,87 @@ textarea:focus {
   background-color: #c0392b;
 }
 
+/* Botão de Toggle */
+.toggle-table-btn {
+  width: 100%;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: var(--primary);
+  color: white;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.toggle-table-btn:hover {
+  background-color: var(--primary-light);
+}
+
+.toggle-table-btn i {
+  transition: transform 0.3s ease;
+}
+
+.toggle-table-btn.collapsed i {
+  transform: rotate(-90deg);
+}
+
+/* Seção de produtos */
+#products-section {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  max-height: 5000px;
+  opacity: 1;
+  visibility: visible;
+  display: block !important;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  margin: 0.5rem 0 1.5rem 0;
+  background-color: var(--card-bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+#products-section.collapsed {
+  max-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  box-shadow: none;
+}
+
+/* Ajustes para o tema escuro */
+[data-theme="dark"] #products-section {
+  border-color: var(--dark-border);
+  background-color: var(--dark-card-bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .toggle-table-btn {
+  background-color: var(--dark-primary);
+  border-color: var(--dark-border);
+}
+
+[data-theme="dark"] .toggle-table-btn:hover {
+  background-color: var(--primary-light);
+}
+
+/* Efeito de hover consistente */
+.toggle-table-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .toggle-table-btn:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
 /* Tabela */
 .table-header {
   display: flex;
@@ -337,24 +786,49 @@ textarea:focus {
 
 .search-container {
   position: relative;
-  max-width: 300px;
-  width: 100%;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
 }
 
 .search-input {
-  padding-left: 2.5rem;
-  width: 100%;
+  padding: 0.6rem 2.5rem 0.6rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: var(--card-bg);
+  color: var(--text);
+  width: 250px;
+  max-width: 100%;
+  height: 38px;
+  box-sizing: border-box;
 }
 
-.search-container::before {
-  content: '\f002';
-  font-family: 'Font Awesome 6 Free';
-  font-weight: 900;
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.2);
+  outline: none;
+}
+
+.search-icon {
   position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 12px;
   color: var(--gray);
+  font-size: 0.9rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Ajuste para o tema escuro */
+[data-theme="dark"] .search-input {
+  background-color: var(--dark-card-bg);
+  border-color: var(--dark-border);
+  color: var(--dark-text);
+}
+
+[data-theme="dark"] .search-icon {
+  color: var(--dark-text-muted);
 }
 
 .date-picker-icon i {
